@@ -1,7 +1,7 @@
 # Olilo Pulse for Home Assistant
 
 <p align="center">
-  <img src="logo.svg" alt="Olilo Pulse" width="300">
+  <img src="logo.png" alt="Olilo Pulse" width="200">
 </p>
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
