@@ -1,0 +1,12 @@
+{
+  "domain": "olilo_pulse",
+  "name": "Olilo Pulse",
+  "codeowners": ["@jackl5"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/jackl5/ha-olilo-pulse",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/jackl5/ha-olilo-pulse/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

@@ -1,0 +1,51 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Olilo Pulse",
+        "description": "Enter your Olilo Pulse API key.",
+        "data": {
+          "api_key": "API Key"
+        },
+        "data_description": {
+          "api_key": "Your Olilo Pulse API key (starts with pulse_)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Olilo Pulse API",
+      "invalid_auth": "Invalid API key",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This API key is already configured"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "avg_latency": {
+        "name": "Average latency"
+      },
+      "min_latency": {
+        "name": "Minimum latency"
+      },
+      "max_latency": {
+        "name": "Maximum latency"
+      },
+      "jitter": {
+        "name": "Jitter"
+      },
+      "packet_loss": {
+        "name": "Packet loss"
+      },
+      "uptime": {
+        "name": "Uptime"
+      }
+    },
+    "binary_sensor": {
+      "status": {
+        "name": "Status"
+      }
+    }
+  }
+}
