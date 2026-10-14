@@ -6,13 +6,12 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 
-A Home Assistant integration for [Olilo Pulse](https://pulse.olilo.co.uk) — continuous network quality monitoring. Track ping latency, packet loss, jitter, and uptime for all your Pulse monitors directly in Home Assistant.
+A Home Assistant integration for [Olilo Pulse](https://pulse.olilo.co.uk) — continuous network quality monitoring. Track ping latency, packet loss, and uptime for all your Pulse monitors directly in Home Assistant.
 
 ## Features
 
 - **Automatic discovery** of all monitors on your Olilo Pulse account
 - **Latency tracking** — average, minimum, and maximum ping latency (ms)
-- **Jitter** — network jitter measurement (ms)
 - **Packet loss** — percentage of lost packets
 - **Uptime** — monitor uptime percentage
 - **Status** — binary sensor for monitor up/down connectivity state
@@ -50,10 +49,10 @@ Each Pulse monitor creates the following entities:
 | Average latency | Sensor | ms | Average ping latency (24h) |
 | Minimum latency | Sensor | ms | Minimum ping latency (24h) |
 | Maximum latency | Sensor | ms | Maximum ping latency (24h) |
-| Jitter | Sensor | ms | Network jitter (24h) |
 | Packet loss | Sensor | % | Packet loss percentage (24h) |
 | Uptime | Sensor | % | Monitor uptime percentage (24h) |
-| Status | Binary sensor | — | Monitor connectivity (up/down) |
+| Total pings | Sensor | — | Total ping count (24h) |
+| Status | Binary sensor | — | Monitor connectivity (active/inactive) |
 
 ## API
 

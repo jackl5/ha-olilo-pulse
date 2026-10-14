@@ -19,7 +19,7 @@ from .coordinator import OliloPulseCoordinator
 
 SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
     SensorEntityDescription(
-        key="avg_latency",
+        key="avgLatency",
         translation_key="avg_latency",
         native_unit_of_measurement=UnitOfTime.MILLISECONDS,
         device_class=SensorDeviceClass.DURATION,
@@ -27,7 +27,7 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         suggested_display_precision=1,
     ),
     SensorEntityDescription(
-        key="min_latency",
+        key="minLatency",
         translation_key="min_latency",
         native_unit_of_measurement=UnitOfTime.MILLISECONDS,
         device_class=SensorDeviceClass.DURATION,
@@ -35,7 +35,7 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         suggested_display_precision=1,
     ),
     SensorEntityDescription(
-        key="max_latency",
+        key="maxLatency",
         translation_key="max_latency",
         native_unit_of_measurement=UnitOfTime.MILLISECONDS,
         device_class=SensorDeviceClass.DURATION,
@@ -43,53 +43,26 @@ SENSOR_DESCRIPTIONS: tuple[SensorEntityDescription, ...] = (
         suggested_display_precision=1,
     ),
     SensorEntityDescription(
-        key="jitter",
-        translation_key="jitter",
-        native_unit_of_measurement=UnitOfTime.MILLISECONDS,
-        device_class=SensorDeviceClass.DURATION,
-        state_class=SensorStateClass.MEASUREMENT,
-        suggested_display_precision=1,
-    ),
-    SensorEntityDescription(
-        key="packet_loss",
+        key="avgPacketLoss",
         translation_key="packet_loss",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=1,
     ),
     SensorEntityDescription(
-        key="uptime",
+        key="uptimePercent",
         translation_key="uptime",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=2,
     ),
+    SensorEntityDescription(
+        key="totalPings",
+        translation_key="total_pings",
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:counter",
+    ),
 )
-
-STAT_KEY_MAP = {
-    "avg_latency": ("avg_latency", "avgLatency", "avg", "average", "latency_avg", "mean"),
-    "min_latency": ("min_latency", "minLatency", "min", "latency_min"),
-    "max_latency": ("max_latency", "maxLatency", "max", "latency_max"),
-    "jitter": ("jitter", "avg_jitter", "avgJitter", "jitter_avg"),
-    "packet_loss": ("packet_loss", "packetLoss", "loss", "packet_loss_pct"),
-    "uptime": ("uptime", "uptime_pct", "uptimePercentage", "availability"),
-}
-
-
-def _extract_stat(stats: dict[str, Any], key: str) -> float | None:
-    candidates = STAT_KEY_MAP.get(key, (key,))
-    for candidate in candidates:
-        val = stats.get(candidate)
-        if val is not None:
-            try:
-                return round(float(val), 3)
-            except (ValueError, TypeError):
-                continue
-    return None
-
-
-def _get_monitor_name(monitor: dict[str, Any]) -> str:
-    return monitor.get("name") or monitor.get("title") or monitor.get("url") or monitor.get("target") or "Unknown"
 
 
 async def async_setup_entry(
@@ -100,7 +73,7 @@ async def async_setup_entry(
     coordinator: OliloPulseCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     entities: list[OliloPulseSensor] = []
-    for monitor_id, monitor_data in coordinator.data.items():
+    for monitor_id in coordinator.data:
         for description in SENSOR_DESCRIPTIONS:
             entities.append(
                 OliloPulseSensor(coordinator, entry, monitor_id, description)
@@ -123,12 +96,11 @@ class OliloPulseSensor(CoordinatorEntity[OliloPulseCoordinator], SensorEntity):
         self.entity_description = description
         self._monitor_id = monitor_id
         monitor = coordinator.data[monitor_id]["monitor"]
-        monitor_name = _get_monitor_name(monitor)
 
         self._attr_unique_id = f"{entry.entry_id}_{monitor_id}_{description.key}"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, f"{entry.entry_id}_{monitor_id}")},
-            "name": f"Olilo Pulse {monitor_name}",
+            "name": f"Olilo Pulse {monitor['name']}",
             "manufacturer": "Olilo",
             "model": "Pulse Monitor",
             "entry_type": None,
@@ -139,4 +111,7 @@ class OliloPulseSensor(CoordinatorEntity[OliloPulseCoordinator], SensorEntity):
         if self._monitor_id not in self.coordinator.data:
             return None
         stats = self.coordinator.data[self._monitor_id].get("stats", {})
-        return _extract_stat(stats, self.entity_description.key)
+        val = stats.get(self.entity_description.key)
+        if val is None:
+            return None
+        return round(float(val), 3)

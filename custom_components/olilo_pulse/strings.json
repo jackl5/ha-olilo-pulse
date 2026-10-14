@@ -32,14 +32,14 @@
       "max_latency": {
         "name": "Maximum latency"
       },
-      "jitter": {
-        "name": "Jitter"
-      },
       "packet_loss": {
         "name": "Packet loss"
       },
       "uptime": {
         "name": "Uptime"
+      },
+      "total_pings": {
+        "name": "Total pings"
       }
     },
     "binary_sensor": {

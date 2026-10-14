@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -13,19 +11,6 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator import OliloPulseCoordinator
-
-STATUS_UP_VALUES = {"up", "online", "active", "healthy", "ok", "true", "1"}
-
-
-def _get_monitor_name(monitor: dict[str, Any]) -> str:
-    return monitor.get("name") or monitor.get("title") or monitor.get("url") or monitor.get("target") or "Unknown"
-
-
-def _is_monitor_up(monitor: dict[str, Any]) -> bool | None:
-    status = monitor.get("status", monitor.get("state"))
-    if status is None:
-        return None
-    return str(status).lower() in STATUS_UP_VALUES
 
 
 async def async_setup_entry(
@@ -56,12 +41,11 @@ class OliloPulseStatusSensor(CoordinatorEntity[OliloPulseCoordinator], BinarySen
         super().__init__(coordinator)
         self._monitor_id = monitor_id
         monitor = coordinator.data[monitor_id]["monitor"]
-        monitor_name = _get_monitor_name(monitor)
 
         self._attr_unique_id = f"{entry.entry_id}_{monitor_id}_status"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, f"{entry.entry_id}_{monitor_id}")},
-            "name": f"Olilo Pulse {monitor_name}",
+            "name": f"Olilo Pulse {monitor['name']}",
             "manufacturer": "Olilo",
             "model": "Pulse Monitor",
             "entry_type": None,
@@ -71,5 +55,8 @@ class OliloPulseStatusSensor(CoordinatorEntity[OliloPulseCoordinator], BinarySen
     def is_on(self) -> bool | None:
         if self._monitor_id not in self.coordinator.data:
             return None
-        monitor = self.coordinator.data[self._monitor_id].get("monitor", {})
-        return _is_monitor_up(monitor)
+        latest_ping = self.coordinator.data[self._monitor_id].get("latest_ping", {})
+        alive = latest_ping.get("alive")
+        if alive is None:
+            return None
+        return alive
